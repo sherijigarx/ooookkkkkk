@@ -75,8 +75,6 @@ class MusicGeneration(bt.Synapse):
     # Required request input, filled by sending dendrite caller.
     text_input: Optional[str] = None
     model_name: Optional[str] = None
-    # clone_input: Optional[List] = None
-    # Here we define speech_output as an Optional PyTorch tensor instead of bytes.
     music_output: Optional[List] = None
 
     completion: str = None

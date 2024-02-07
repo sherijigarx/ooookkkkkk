@@ -3,7 +3,7 @@
 *.pth
 *.wav
 *.mp3
-*.csv
+# *.csv
 *.txt
 *.npz
 wandb/

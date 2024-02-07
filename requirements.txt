@@ -17,7 +17,6 @@ TTS
 pydub
 sox
 soundfile
-fairseq
 encodec
 funcy
 audiolm_pytorch
@@ -28,3 +27,4 @@ GPUtil
 laion_clap
 audiocraft
 pydantic==1.10.13
+fairseq

@@ -25,6 +25,6 @@ scipy
 psutil
 GPUtil
 laion_clap
-audiocraft
+audiocraft==1.0.0
 pydantic==1.10.13
-fairseq
+fairseq==0.11.1

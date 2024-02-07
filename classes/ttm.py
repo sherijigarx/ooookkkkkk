@@ -36,6 +36,7 @@ class MusicGenerationService(AIModelService):
         self.last_reset_weights_block = self.current_block
         self.islocaltts = False
         self.p_index = 0
+        self.filtered_axon = []
         
         ###################################### DIRECTORY STRUCTURE ###########################################
         self.ttm_source_dir = os.path.join(audio_subnet_path, "ttm_source")
@@ -216,7 +217,7 @@ class MusicGenerationService(AIModelService):
             # Score the output and update the weights
             score = self.score_output(output_path, prompt)
             bt.logging.info(f"Aggregated Score from the NISQA and WER Metric: {score}")
-            self.update_score(axon, score)
+            self.update_score(axon, score, service="Text-To-Music", ax=self.filtered_axon)
 
         except Exception as e:
             bt.logging.error(f"Error processing speech output: {e}")
@@ -248,6 +249,11 @@ class MusicGenerationService(AIModelService):
         queryable_uids = (self.metagraph.total_stake >= 0)
         # Remove the weights of miners that are not queryable.
         queryable_uids = queryable_uids * torch.Tensor([self.metagraph.neurons[uid].axon_info.ip != '0.0.0.0' for uid in uids])
+        queryable_uid = queryable_uids * torch.Tensor([
+            any(self.metagraph.neurons[uid].axon_info.ip == ip for ip in lib.BLACKLISTED_IPS) or
+            any(self.metagraph.neurons[uid].axon_info.ip.startswith(prefix) for prefix in lib.BLACKLISTED_IPS_SEG)
+            for uid in uids
+        ])
         active_miners = torch.sum(queryable_uids)
         dendrites_per_query = self.total_dendrites_per_query
 
@@ -265,10 +271,14 @@ class MusicGenerationService(AIModelService):
                 dendrites_per_query = self.minimum_dendrites_per_query
         # zip uids and queryable_uids, filter only the uids that are queryable, unzip, and get the uids
         zipped_uids = list(zip(uids, queryable_uids))
-        filtered_uids = list(zip(*filter(lambda x: x[1], zipped_uids)))[0]
+        zipped_uid = list(zip(uids, queryable_uid))
+        filtered_zipped_uids = list(filter(lambda x: x[1], zipped_uids))
+        filtered_uids = [item[0] for item in filtered_zipped_uids] if filtered_zipped_uids else []
+        filtered_zipped_uid = list(filter(lambda x: x[1], zipped_uid))
+        filtered_uid = [item[0] for item in filtered_zipped_uid] if filtered_zipped_uid else []
+        self.filtered_axon = filtered_uid
         bt.logging.info(f"filtered_uids:{filtered_uids}")
-        # dendrites_to_query = random.sample( filtered_uids, min( dendrites_per_query, len(filtered_uids) ) )
-        dendrites_to_query = [filtered_uids[0], filtered_uids[1]] # remove before launch
+        dendrites_to_query = random.sample( filtered_uids, min( dendrites_per_query, len(filtered_uids) ) )
         bt.logging.info(f"dendrites_to_query:{dendrites_to_query}")
         return dendrites_to_query
 

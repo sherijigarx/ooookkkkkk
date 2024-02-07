@@ -23,27 +23,6 @@ import torch
 import torchaudio
 
 
-
-class MusicGenSmall:
-    def __init__(self, model_name="facebook/musicgen-small"):
-        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        self.processor = AutoProcessor.from_pretrained(model_name)
-        self.model = MusicgenForConditionalGeneration.from_pretrained(model_name)
-        self.model.to(self.device)
-
-    def generate_music(self, prompt):
-        try:
-            inputs = self.processor(
-                text=[prompt],
-                padding=True,
-                return_tensors="pt",
-            ).to(self.device)
-            audio_values = self.model.generate(**inputs, max_new_tokens=1503)
-            return audio_values[0, 0].cpu().numpy()
-        except Exception as e:
-            print(f"An error occurred in facebook/musicgen-small: {e}")
-            return None
-    
 class MusicGenMedium:
     def __init__(self, model_name="facebook/musicgen-medium"):
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -58,7 +37,7 @@ class MusicGenMedium:
                 padding=True,
                 return_tensors="pt",
             ).to(self.device)
-            audio_values = self.model.generate(**inputs, max_new_tokens=1503)
+            audio_values = self.model.generate(**inputs, max_new_tokens=750)
             print(audio_values[0, 0])
             return audio_values[0, 0].cpu().numpy()
         except Exception as e:
@@ -79,7 +58,7 @@ class MusicGenLarge:
                 padding=True,
                 return_tensors="pt",
             ).to(self.device)
-            audio_values = self.model.generate(**inputs, max_new_tokens=1503)
+            audio_values = self.model.generate(**inputs, max_new_tokens=750)
             return audio_values[0, 0].cpu().numpy()
         except Exception as e:
             print(f"An error occurred in facebook/musicgen-large: {e}")

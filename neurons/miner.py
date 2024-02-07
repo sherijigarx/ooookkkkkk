@@ -60,7 +60,7 @@ sys.path.insert(0, project_root)
 sys.path.insert(0, audio_subnet_path)
 
 # import this repo
-from models.text_to_music import MusicGenSmall, MusicGenMedium, MusicGenLarge
+from models.text_to_music import MusicGenMedium, MusicGenLarge
 from models.text_to_speech_models import SunoBark, TextToSpeechModels, ElevenLabsTTS, EnglishTextToSpeech
 from models.voice_clone import ElevenLabsClone  
 from models.bark_voice_clone import BarkVoiceCloning, ModelLoader
@@ -593,18 +593,14 @@ def main(config):
     def ProcessMusic(synapse: lib.protocol.MusicGeneration) -> lib.protocol.MusicGeneration:
         bt.logging.success("The prompt received from validator!")
         bt.logging.info(f"--------------------------------------------------- before generattion the text input is --------------------------------------------------- : {synapse.text_input}")
-        if config.music_model == "facebook/musicgen-small":
-            bt.logging.info(f"Using the Text-To-Music with the supplied model: {config.music_model}")
-            music = ttm_models.generate_music(synapse.text_input)
         if config.music_model == "facebook/musicgen-medium":
             bt.logging.info(f"Using the Text-To-Music with the supplied model: {config.music_model}")
             music = ttm_models.generate_music(synapse.text_input)
-        if config.music_model == "facebook/musicgen-large":
+        elif config.music_model == "facebook/musicgen-large":
             bt.logging.info(f"Using the Text-To-Music with the supplied model: {config.music_model}")
             music = ttm_models.generate_music(synapse.text_input)
         bt.logging.info(f"--------------------------------------------------- after generattion --------------------------------------------------- : {music}")
         bt.logging.info(f"--------------------------------------------------- after generattion shape --------------------------------------------------- : {music.shape}")
-        bt.logging.info("--------------------------------------------------- after generattion type--------------------------------------------------- :", type(music))
     
         # Check if 'music' contains valid audio data
         if music is None:

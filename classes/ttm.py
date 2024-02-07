@@ -60,7 +60,7 @@ class MusicGenerationService(AIModelService):
             self.local_prompts = pd.read_csv(os.path.join(self.ttm_source_dir, 'ttm_prompts.csv'), header=None, index_col=False)
             self.local_prompts = self.local_prompts[0].values.tolist()
             bt.logging.info(f"Loaded prompts from {self.ttm_source_dir}")
-            # os.remove(os.path.join(self.ttm_source_dir, 'ttm_prompts.csv'))
+            os.remove(os.path.join(self.ttm_source_dir, 'ttm_prompts.csv'))
         
     async def run_async(self):
         step = 0
@@ -142,7 +142,7 @@ class MusicGenerationService(AIModelService):
             filtered_axons,
             lib.protocol.MusicGeneration(roles=["user"], text_input=prompt),
             deserialize=True,
-            timeout=120,
+            timeout=150,
         )
         return responses
     

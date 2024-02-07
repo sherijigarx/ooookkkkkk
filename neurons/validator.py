@@ -47,7 +47,6 @@ async def main():
     tts_service.new_wandb_run()
 
     vc_service = VoiceCloningService()
-    vc_service.new_wandb_run()
 
     # Start vc_service with higher "priority"
     vc_task = asyncio.create_task(vc_service.run_async())

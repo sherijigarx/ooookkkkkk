@@ -80,7 +80,7 @@ class TextToSpeechService(AIModelService):
         commit = self.get_git_commit_hash()
         self.wandb_run = wandb.init(
             name=name,
-            project="subnet16?",
+            project="subnet16",
             entity="testingforsubnet16",
             config={
                 "uid": self.uid,

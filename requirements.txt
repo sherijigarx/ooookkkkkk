@@ -5,7 +5,6 @@ librosa
 transformers
 jiwer
 torchaudio
-torch
 pandas
 matplotlib
 datasets
@@ -27,3 +26,5 @@ scipy
 psutil
 GPUtil
 laion_clap
+audiocraft
+pydantic==1.10.13

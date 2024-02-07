@@ -4,7 +4,6 @@ import random
 import sys
 import lib
 import time
-import wandb
 import torch
 import soundfile as sf
 import asyncio
@@ -76,7 +75,6 @@ class VoiceCloningService(AIModelService):
         step = 0
         running_tasks = []
         while True:
-            self.check_and_update_wandb_run()
             try:
                 new_tasks = await self.main_loop_logic(step)
                 running_tasks.extend(new_tasks)

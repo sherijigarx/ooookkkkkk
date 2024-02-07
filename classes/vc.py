@@ -36,8 +36,6 @@ class VoiceCloningService(AIModelService):
         self.load_vc_voices()
         self.total_dendrites_per_query = self.vcdnp  # Example value, adjust as needed
         self.minimum_dendrites_per_query = 5  # Example value, adjust as needed
-        self.last_run_date = dt.date.today()
-        self.tao = self.metagraph.neurons[self.uid].stake.tao
 
         ###################################### DIRECTORY STRUCTURE ###########################################
         self.source_path = os.path.join(audio_subnet_path, "vc_source")
@@ -73,37 +71,6 @@ class VoiceCloningService(AIModelService):
         if 'train' in dataset:
             self.audio_files = [item['audio'] for item in dataset['train']]
             return self.audio_files
-
-    def check_and_update_wandb_run(self):
-        current_date = dt.date.today()
-        if current_date > self.last_run_date:
-            self.last_run_date = current_date
-            if self.wandb_run:
-                wandb.finish()  # End the current run
-            self.new_wandb_run()  # Start a new run
-
-    def new_wandb_run(self):
-        now = dt.datetime.now()
-        run_id = now.strftime("%Y-%m-%d_%H-%M-%S")
-        name = f"Validator-{self.uid}-{run_id}"
-        commit = self.get_git_commit_hash()
-        self.wandb_run = wandb.init(
-            name=name,
-            project="AudioSubnet_Valid",
-            entity="subnet16team",
-            config={
-                "uid": self.uid,
-                "hotkey": self.wallet.hotkey.ss58_address,
-                "run_name": run_id,
-                "type": "Validator",
-                "tao (stake)": self.tao,
-                "commit": commit,
-            },
-            tags=self.sys_info,
-            allow_val_change=True,
-            anonymous="allow",
-        )
-        bt.logging.debug(f"Started a new wandb run: {name}")
 
     async def run_async(self):
         step = 0

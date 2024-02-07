@@ -171,10 +171,12 @@ class MusicGenerationService(AIModelService):
     def process_response(self, axon, response, prompt):
         try:
             music_output = response.music_output
-            if response is not None and isinstance(response, lib.protocol.MusicGeneration) and response.music_output is not None:
+            if response is not None and isinstance(response, lib.protocol.MusicGeneration) and response.music_output is not None and response.dendrite.status_code == 200:
                 self.handle_music_output(axon, music_output, prompt, response.model_name)
+            elif response.dendrite.status_code != 403:
+                self.punish(axon, service="Text-To-Speech", punish_message=response.dendrite.status_message)
             else:
-                self.punish(axon)
+                pass
         except Exception as e:
             bt.logging.error(f'An error occurred while handling speech output: {e}')
 

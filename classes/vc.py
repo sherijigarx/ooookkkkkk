@@ -225,7 +225,7 @@ class VoiceCloningService(AIModelService):
     def process_voice_clone_responses(self, ax):
         try:
             if self.response is not None and isinstance(self.response, lib.protocol.VoiceClone) and self.response.clone_output is not None and self.response.dendrite.status_code == 200:
-                bt.logging.success(f"Received music output from {ax.hotkey}")
+                bt.logging.success(f"Received Voice Clone output from {ax.hotkey}")
                 self.handle_clone_output(ax, self.response)
             elif self.response.dendrite.status_code != 403:
                 self.punish(ax, service="Voice Cloning", punish_message=self.response.dendrite.status_message)

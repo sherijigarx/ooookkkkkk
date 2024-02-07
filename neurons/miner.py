@@ -538,10 +538,27 @@ def main(config):
                 f"Blacklisting unrecognized hotkey {synapse.dendrite.hotkey}"
             )
             return True, "Unrecognized hotkey"
-        bt.logging.trace(
-            f"Not Blacklisting recognized hotkey {synapse.dendrite.hotkey}"
-        )
-        return False, "Hotkey recognized!"
+        elif synapse.dendrite.hotkey in metagraph.hotkeys and metagraph.S[metagraph.hotkeys.index(synapse.dendrite.hotkey)] < lib.MIN_STAKE:
+            # Ignore requests from entities with low stake.
+            bt.logging.trace(
+                f"Blacklisting hotkey {synapse.dendrite.hotkey} with low stake"
+            )
+            return True, "Low stake"
+        elif synapse.dendrite.hotkey in lib.BLACKLISTED_VALIDATORS:
+            bt.logging.trace(
+                f"Blacklisting Key recognized as blacklisted hotkey {synapse.dendrite.hotkey}"
+            )
+            return True, "Blacklisted hotkey"
+        elif synapse.dendrite.hotkey in lib.WHITELISTED_VALIDATORS:
+            bt.logging.trace(
+                f"Not Blacklisting recognized hotkey {synapse.dendrite.hotkey}"
+            )
+            return False, "Hotkey recognized!"
+        else:
+            bt.logging.trace(
+                f"Not Blacklisting recognized hotkey {synapse.dendrite.hotkey}"
+            )
+            return True, "Hotkey recognized as Blacklisted!"
 
     # The priority function determines the order in which requests are handled.
     # More valuable or higher-priority requests are processed before others.
@@ -618,7 +635,10 @@ def main(config):
         priority_fn= vc_priority_fn).attach(
         forward_fn= ProcessSpeech,
         blacklist_fn= speech_blacklist_fn,
-        priority_fn= speech_priority_fn,
+        priority_fn= speech_priority_fn,).attach(
+        forward_fn= ProcessMusic,
+        blacklist_fn= music_blacklist_fn,
+        priority_fn= music_priority_fn,
     )
 
     # Serve passes the axon information to the network + netuid we are hosting on.
